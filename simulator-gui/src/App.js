@@ -1,29 +1,17 @@
 import React, { useState, useEffect } from "react";
 import socketIOClient from "socket.io-client";
 import Cell from "./components/Cell/Cell";
-import { LedGenerator } from "./LedGenerator";
 const ENDPOINT = "http://127.0.0.1:4000";
 
 function App() {
-  const [leds, setLeds] = useState(LedGenerator(30));
-  
-  const updateLeds = (newLed) => {
-    setLeds(previousLeds => {
-      const index = previousLeds.findIndex(led => led.ledId === newLed.ledId)
-
-      const updatedLeds = [...previousLeds]; 
-      updatedLeds[index] = newLed
-      
-      return updatedLeds
-    })
-  }
+  const [leds, setLeds] = useState([]);
   
   useEffect(() => {
     const socket = socketIOClient(ENDPOINT);
     
-    socket.on("text", updateLeds);
+    socket.on("text", setLeds);
 
-    return(() => socket.off("text", updateLeds));
+    return(() => socket.off("text", setLeds));
   }, []);
 
   return (
