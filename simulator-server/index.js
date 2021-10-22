@@ -1,8 +1,8 @@
 const { Server } = require("socket.io");
 const express = require('express');
 const app = express();
-const bodyParser = require('body-parser')
-
+const bodyParser = require('body-parser');
+const {updateLeds, getLedState, initializeLedState} = require("./LedState")
 const port = 4000;
 
 const server = app.listen(port, () =>{
@@ -22,15 +22,18 @@ app.post('/brightness', (req, res) => {
  })
 
  app.post('/show', (req, res) => {   
-    io.emit("text", req.body.test)
+    io.emit("text", getLedState())
     
     res.status(200)
     res.send({})
  })
 
- app.post('/setPixelColor', (req, res) => {   
-    io.emit("text", req.body)
-    
+ app.post('/setPixelColor', (req, res) => {  
+    const newLed = req.body
+    console.log(newLed) 
+
+    updateLeds(newLed)
+
     res.status(200)
     res.send({})
  })
@@ -41,12 +44,21 @@ app.post('/brightness', (req, res) => {
     res.status(200)
     res.send({})
  })
- app.post('/newPixelStrip', (req, res) => {   
-    io.emit("text", req.body.test)
-    
-    res.status(200)
-    res.send({})
- })
+ 
+ app.post('/newPixelStrip', (req, res) => {  
+   
+   initializeLedState();
+   
+   res.status(200)
+   res.send({})
+})
+
+app.post('/begin', (req, res) => {  
+   // set some var, check if var is set in all calls and throw error if not (Intialize the library (must be called once before other functions).)
+   
+   res.status(200)
+   res.send({})
+})
 
 io.on('connection', (socket) => {  console.log('a user connected');});
 
